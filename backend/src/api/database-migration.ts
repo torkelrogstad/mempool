@@ -7,7 +7,7 @@ import cpfpRepository from '../repositories/CpfpRepository';
 import { RowDataPacket } from 'mysql2';
 
 class DatabaseMigration {
-  private static currentVersion = 66;
+  private static currentVersion = 67;
   private queryTimeout = 3600_000;
   private statisticsAddedIndexed = false;
   private uniqueLogs: string[] = [];
@@ -557,6 +557,11 @@ class DatabaseMigration {
     if (databaseSchemaVersion < 66) {
       await this.$executeQuery('ALTER TABLE `statistics` ADD min_fee FLOAT UNSIGNED DEFAULT NULL');
       await this.updateToSchemaVersion(66);
+    }
+
+    if (databaseSchemaVersion < 67) {
+      await this.$executeQuery('ALTER TABLE `hashrates` MODIFY `type` enum("daily", "weekly", "reported") DEFAULT "daily"');
+      await this.updateToSchemaVersion(67);
     }
   }
 

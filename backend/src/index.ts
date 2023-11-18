@@ -43,6 +43,7 @@ import { AxiosError } from 'axios';
 import v8 from 'v8';
 import { formatBytes, getBytesUnit } from './utils/format';
 import redisCache from './api/redis-cache';
+import poolReportedHashrate from './tasks/pool-reported-hashrate';
 
 class Server {
   private wss: WebSocket.Server | undefined;
@@ -212,6 +213,7 @@ class Server {
       }
       indexer.$run();
       priceUpdater.$run();
+      poolReportedHashrate.$run();
 
       // rerun immediately if we skipped the mempool update, otherwise wait POLL_RATE_MS
       const elapsed = Date.now() - start;

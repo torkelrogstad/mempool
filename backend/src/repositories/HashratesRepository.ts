@@ -7,9 +7,40 @@ import PoolsRepository from './PoolsRepository';
 
 class HashratesRepository {
   /**
-   * Save indexed block data in the database
+   * Save one hashrate into the db
    */
-  public async $saveHashrates(hashrates: any) {
+  public async $saveHashrate(hashrate): Promise<void> {
+    try {
+      await DB.query(`
+        INSERT INTO hashrates
+        SET
+          hashrate_timestamp = FROM_UNIXTIME(?),
+          avg_hashrate = ?,
+          pool_id = ?,
+          share = -1,
+          type = ?
+        ON DUPLICATE KEY UPDATE avg_hashrate = ?
+      `, [
+        hashrate.hashrateTimestamp,
+        hashrate.avgHashrate,
+        hashrate.poolId,
+        hashrate.type,
+        hashrate.avgHashrate,
+      ]);
+    } catch (e: any) {
+      if (e.errno === 1062) { // ER_DUP_ENTRY - This scenario is possible upon node backend restart
+        return;
+      } else {
+        logger.err('Cannot save indexed hashrate into db. Reason: ' + (e instanceof Error ? e.message : e), logger.tags.mining);
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * Save an array of hashrates into the db
+   */
+  public async $saveHashrates(hashrates: any): Promise<void> {
     if (hashrates.length === 0) {
       return;
     }

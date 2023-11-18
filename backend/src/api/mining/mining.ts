@@ -348,7 +348,7 @@ class Mining {
         hashrates.push({
           hashrateTimestamp: toTimestamp / 1000,
           avgHashrate: lastBlockHashrate,
-          poolId: 0,
+          poolId: 0, // Network hashrate
           share: 1,
           type: 'daily',
         });

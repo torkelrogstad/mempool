@@ -34,7 +34,7 @@ class PoolsRepository {
 
     let query = `
       SELECT
-        COUNT(blocks.height) As blockCount,
+          COUNT(blocks.height) AS blockCount,
           pool_id AS poolId,
           pools.name AS name,
           pools.link AS link,
