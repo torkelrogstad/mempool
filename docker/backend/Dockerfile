@@ -3,11 +3,9 @@ FROM node:20.15.0-buster-slim AS builder
 ARG commitHash
 ENV MEMPOOL_COMMIT_HASH=${commitHash}
 
-WORKDIR /build
-COPY . .
-
 RUN apt-get update
 RUN apt-get install -y build-essential python3 pkg-config curl ca-certificates
+
 
 # Install Rust via rustup
 RUN CPU_ARCH=$(uname -m); if [ "$CPU_ARCH" = "armv7l" ]; then c_rehash; fi
@@ -15,6 +13,8 @@ RUN CPU_ARCH=$(uname -m); if [ "$CPU_ARCH" = "armv7l" ]; then c_rehash; fi
 #Workaround to run on github actions from https://github.com/rust-lang/rustup/issues/2700#issuecomment-1367488985
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sed 's#/proc/self/exe#\/bin\/sh#g' | sh -s -- -y --default-toolchain stable
 ENV PATH="/root/.cargo/bin:$PATH"
+
+WORKDIR /build
 
 COPY --from=backend . .
 COPY --from=rustgbt . ../rust/
@@ -25,6 +25,8 @@ WORKDIR /build
 RUN npm run package
 
 FROM node:20.15.0-buster-slim
+
+RUN apt-get update && apt-get install -y curl
 
 WORKDIR /backend
 
