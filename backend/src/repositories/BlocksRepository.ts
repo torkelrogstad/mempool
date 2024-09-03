@@ -139,18 +139,28 @@ class BlocksRepository {
         throw Error(`Could not find a mining pool with the unique_id = ${block.extras.pool.id}. This error should never be printed.`);
       }
 
+      // Block headers include extra info from mainchain, due to the whole
+      // "signet" shenanigan setup. Make sure to not insert too much!
+      const blockHeaderSizeBytes = 80;
+
       const params: any[] = [
         block.height,
         block.id,
         block.timestamp,
         block.size,
         block.weight,
-        block.tx_count,
+        block.tx_count || 0,
         block.extras.coinbaseRaw,
         block.difficulty,
         poolDbId.id,
         block.extras.totalFees,
-        JSON.stringify(block.extras.feeRange),
+        JSON.stringify(
+          // Make sure we have no NaNs
+          block.extras.feeRange.find(
+            fee => Number.isNaN(fee) ?
+            Array.from({length:  block.extras.feeRange.length}) :
+            block.extras.feeRange)
+        ),
         block.extras.medianFee,
         block.extras.reward,
         block.version,
@@ -161,7 +171,7 @@ class BlocksRepository {
         block.extras.avgFee,
         block.extras.avgFeeRate,
         block.mediantime,
-        block.extras.header,
+        block.extras.header.slice(0, blockHeaderSizeBytes * 2),
         block.extras.coinbaseAddress,
         block.extras.coinbaseAddresses ? JSON.stringify(block.extras.coinbaseAddresses) : null,
         truncatedCoinbaseSignature,

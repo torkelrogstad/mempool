@@ -251,6 +251,14 @@ class TransactionUtils {
   }
 
   public convertScriptSigAsm(hex: string): string {
+    try {
+      return this.convertScriptSigAsmWithTry(hex);
+    } catch {
+      return '';
+    }
+  }
+
+  private convertScriptSigAsmWithTry(hex: string): string {
     const buf = Buffer.from(hex, 'hex');
 
     const b: string[] = [];

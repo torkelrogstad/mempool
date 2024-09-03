@@ -124,8 +124,10 @@ class Blocks {
 
     if (onlyCoinbase) {
       try {
+        logger.info(`get txs extended: fetching coinbase ${txIds[0]}`);
         const coinbase = await transactionUtils.$getTransactionExtendedRetry(txIds[0], false, false, false, addMempoolData);
         if (coinbase && coinbase.vin[0].is_coinbase) {
+          logger.debug(`get txs extended: fetched coinbase: ${JSON.stringify(coinbase)}`);
           return [coinbase];
         } else {
           const msg = `Expected a coinbase tx, but the backend API returned something else`;
@@ -266,7 +268,39 @@ class Blocks {
       extras.segwitTotalSize = 0;
       extras.segwitTotalWeight = 0;
     } else {
-      const stats: IBitcoinApi.BlockStats = await bitcoinClient.getBlockStats(block.id);
+      // const stats: IBitcoinApi.BlockStats = await bitcoinClient.getBlockStats(block.id);
+      // Drivechain does NOT have this implemented, so just return whatever.
+      const stats: IBitcoinApi.BlockStats = {
+        avgfee: 0,
+        avgfeerate: 0,
+        avgtxsize: 0,
+        blockhash: '',
+        feerate_percentiles: [0, 0, 0, 0, 0],
+        height: 0,
+        ins: 0,
+        maxfee: 0,
+        maxfeerate: 0,
+        maxtxsize: 0,
+        medianfee: 0,
+        mediantime: 0,
+        mediantxsize: 0,
+        minfee: 0,
+        minfeerate: 0,
+        mintxsize: 0,
+        outs: 0,
+        subsidy: 0,
+        swtotal_size: 0,
+        swtotal_weight: 0,
+        swtxs: 0,
+        time: 0,
+        total_out: 0,
+        total_size: 0,
+        total_weight: 0,
+        totalfee: 0,
+        txs: 1,
+        utxo_increase: 0,
+        utxo_size_inc: 0,
+      };
       let feeStats = {
         medianFee: stats.feerate_percentiles[2], // 50th percentiles
         feeRange: [stats.minfeerate, stats.feerate_percentiles, stats.maxfeerate].flat(),
