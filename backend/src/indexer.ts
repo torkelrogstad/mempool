@@ -37,7 +37,9 @@ class Indexer {
   public async checkAvailableCoreIndexes(): Promise<void> {
     const updatedCoreIndexes: CoreIndex[] = [];
 
-    const indexes: any = await bitcoinClient.getIndexInfo();
+    // `getindexinfo` is not implemented in mainchain. 
+    // const indexes: any = await bitcoinClient.getIndexInfo();
+    const indexes: any[] = []
     for (const indexName in indexes) {
       const newState = {
         name: indexName,
