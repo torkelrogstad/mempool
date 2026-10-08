@@ -149,6 +149,10 @@ class Server {
         res.setHeader('Access-Control-Expose-Headers', 'X-Total-Count,X-Mempool-Auth');
         next();
       })
+      // POST /tx expects the raw transaction hex as the body. Read it as text
+      // whatever the Content-Type, before the parsers below can turn a form
+      // or JSON body into an object (which the handler rejects).
+      .post(config.MEMPOOL.API_URL_PREFIX + 'tx', express.text({ type: () => true, limit: '10mb' }))
       .use(express.urlencoded({ extended: true, limit: '10mb' }))
       .use(express.text({ type: ['text/plain', 'application/base64'], limit: '10mb' }))
       .use(express.json({ limit: '10mb' }))
